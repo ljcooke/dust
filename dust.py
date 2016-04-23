@@ -3,10 +3,14 @@
 SVG cosmic dust generator.
 
 """
+import subprocess
 import sys
 from random import choice, randint, random
 
 from mako.template import Template
+
+
+__license__ = 'http://unlicense.org/'
 
 
 TEMPLATE_PATH = 'template.svg'
@@ -21,6 +25,7 @@ INT_MAX = 2 ** 64 - 1
 DARK_VALUES = (0x11, 0x22, 0x33, 0x44, 0x55, 0x66)
 MIDDLE_VALUES = (0x66, 0x77, 0x77, 0x88, 0x88, 0x99, 0x99, 0xAA)
 BRIGHT_VALUES = (0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF)
+
 
 def dust_svg(width, height, template_path=TEMPLATE_PATH):
     """
@@ -66,7 +71,7 @@ def dust_svg(width, height, template_path=TEMPLATE_PATH):
             or '%.2f' % (random() * 0.5)
         ),
         'rand_star_offset': lambda: '%.2f' % (random() * random() * 2),
-        'rand_star_radius': lambda: '%.2f' % (random() * random() * 3 + 0.5),
+        'rand_star_radius': lambda: '%.2f' % (random() * random() * 2.5 + 0.5),
         'rand_star_rgb': lambda: '%d, %d, %d' % (
             byteval(rand_value_bright() * 1.25),
             byteval(rand_value_bright() * 1.25),
@@ -86,11 +91,9 @@ def main():
     with open(OUTPUT_SVG_PATH, 'w') as svg_file:
         svg_file.write(svg)
 
-    # the gaussian blur filter isn't working with cairosvg
-#    print('Writing %s' % OUTPUT_PNG_PATH)
-#    with open(OUTPUT_PNG_PATH, 'bw') as png_file:
-#        cairosvg.svg2png(bytestring=bytes(svg, encoding='utf-8'),
-#                         write_to=png_file)
+    print('Writing %s' % OUTPUT_PNG_PATH)
+    with open(OUTPUT_PNG_PATH, 'bw') as png_file:
+        subprocess.call(['rsvg-convert', OUTPUT_SVG_PATH], stdout=png_file)
 
     print('Done')
 
