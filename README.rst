@@ -24,6 +24,12 @@ On OS X, these may be installed using Homebrew:
 
     brew install librsvg imagemagick
 
+Example
+-------
+
+.. image:: sample.jpg
+
+
 .. _@dust_exe: https://twitter.com/dust_exe
 .. _Cheap Bots Done Quick: http://cheapbotsdonequick.com/
 .. _Tracery JSON source: http://cheapbotsdonequick.com/source/dust_exe
