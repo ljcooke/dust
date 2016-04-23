@@ -72,6 +72,22 @@
             filter="url(#cloudblur)"
         />
       % endfor
+      % for _ in range(10):
+        <circle
+            cx="${rand_shadow_x()}" cy="${rand_shadow_y()}"
+            r="${rand_cloud_radius()}"
+            fill="rgba(${rand_cloud_dark_rgb()}, ${rand_cloud_dark_alpha})"
+            filter="url(#cloudblur)"
+        />
+      % endfor
+      % for _ in range(15):
+        <circle
+            cx="${rand_bias_x()}" cy="${rand_bias_y()}"
+            r="${rand_cloud_smaller_radius()}"
+            fill="rgba(${rand_cloud_bright_rgb()}, ${rand_cloud_bright_alpha})"
+            filter="url(#cloudblur)"
+        />
+      % endfor
     </g>
 
     <g id="stars" filter="url(#star-screen)">

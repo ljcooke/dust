@@ -36,11 +36,20 @@ BRIGHT_VALUES = (0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF)
 EMOJI = """👽🌌✨🚀🌕🌑"""
 
 
+def biased_randint(bias, upper):
+    r_num = random() * random()
+    if randint(0, 1) == 0:
+        r_num *= random()
+    return int(r_num * upper + bias) % (upper + 1)
+
 def dust_svg(width, height, template_path=TEMPLATE_PATH):
     """
     Generate a dust image as SVG.
 
     """
+    bias_x, bias_y = randint(0, width), randint(0, height)
+    shadow_x, shadow_y = randint(0, width), randint(0, height)
+
     byteval = lambda n: min(max(0, int(n)), 255)
 
     rand_value_bright = lambda: (choice(BRIGHT_VALUES + (None,))
@@ -59,11 +68,32 @@ def dust_svg(width, height, template_path=TEMPLATE_PATH):
     rgb_greener = lambda: (rand_value_middle(), 0xEE, rand_value_middle())
     rgb_bluer   = lambda: (rand_value_middle(), rand_value_middle(), 0xEE)
 
+    rgb_focus = choice((
+        (0xFF, 0x33, 0x33), (0xFF, 0x33, 0x33),
+        (0x33, 0xFF, 0x33),
+        (0x33, 0x33, 0xFF), (0x33, 0x33, 0xFF),
+        (0xFF, 0x88, 0x33),
+        (0x33, 0x88, 0xFF),
+        (0xFF, 0x33, 0xFF),
+    ))
+
+    print('Width     : %d' % width)
+    print('Height    : %d' % height)
+    print('Gravity X : %d' % bias_x)
+    print('Gravity Y : %d' % bias_y)
+    print('Shadow X  : %d' % shadow_x)
+    print('Shadow Y  : %d' % shadow_y)
+    print('Color     : %s' % repr(rgb_focus))
+
     params = {
         'width': width,
         'height': height,
         'rand_x': lambda: randint(0, width),
         'rand_y': lambda: randint(0, height),
+        'rand_bias_x': lambda: biased_randint(bias_x, width),
+        'rand_bias_y': lambda: biased_randint(bias_y, height),
+        'rand_shadow_x': lambda: biased_randint(shadow_x, width),
+        'rand_shadow_y': lambda: biased_randint(shadow_y, height),
 
         'noise_base_freq': '%0.3f' % (random() * 0.1),
         'noise_seed': randint(0, INT_MAX),
@@ -71,14 +101,23 @@ def dust_svg(width, height, template_path=TEMPLATE_PATH):
 
         'cloud_blur_amount': 35,
         'rand_cloud_alpha': '%0.3f' % ((random() * 0.04) + 0.1),
+        'rand_cloud_bright_alpha': '%0.3f' % ((random() * 0.1) + 0.1),
+        'rand_cloud_dark_alpha': '%0.3f' % ((random() * 0.2) + 0.1),
         'rand_cloud_radius': lambda: randint(200, 800),
+        'rand_cloud_smaller_radius': lambda: randint(100, 400),
         'rand_cloud_rgb': lambda: '%d, %d, %d' % choice((
             rgb_bright, rgb_bright, rgb_bright, rgb_bright, rgb_bright,
             rgb_middle, rgb_middle,
             rgb_redder, rgb_redder, rgb_redder, rgb_redder, rgb_redder,
             rgb_greener,
             rgb_bluer, rgb_bluer, rgb_bluer, rgb_bluer, rgb_bluer,
+            lambda: rgb_focus, lambda: rgb_focus,
         ))(),
+        'rand_cloud_bright_rgb': lambda: '%d, %d, %d' % choice((
+            (0xFF, 0xFF, 0xFF), (0xFF, 0xFF, 0xFF), (0xFF, 0xFF, 0xFF),
+            rgb_focus,
+        )),
+        'rand_cloud_dark_rgb': lambda: '0, 0, 0',
 
         'star_blur_amount': 0.1,
         'rand_star_alpha': lambda: (
