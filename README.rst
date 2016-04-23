@@ -21,7 +21,6 @@ On OS X, these may be installed using Homebrew:
 
     brew install librsvg imagemagick
 
-
 .. _@dust_exe: https://twitter.com/dust_exe
 .. _librsvg: https://wiki.gnome.org/Projects/LibRsvg
 .. _ImageMagick: http://imagemagick.org/script/index.php

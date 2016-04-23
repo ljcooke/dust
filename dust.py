@@ -3,10 +3,13 @@
 SVG cosmic dust generator.
 
 """
+import base64
+import os
 import subprocess
 import sys
 from random import choice, randint, random
 
+import twitter
 from mako.template import Template
 
 
@@ -28,6 +31,8 @@ INT_MAX = 2 ** 64 - 1
 DARK_VALUES = (0x11, 0x22, 0x33, 0x44, 0x55, 0x66)
 MIDDLE_VALUES = (0x66, 0x77, 0x77, 0x88, 0x88, 0x99, 0x99, 0xAA)
 BRIGHT_VALUES = (0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF)
+
+EMOJI = """👽🌌✨"""
 
 
 def dust_svg(width, height, template_path=TEMPLATE_PATH):
@@ -86,6 +91,49 @@ def dust_svg(width, height, template_path=TEMPLATE_PATH):
     return template.render(**params)
 
 
+def post_tweet(text, image_path=None,
+               user_token=None, user_secret=None,
+               consumer_key=None, consumer_secret=None):
+    """
+    Post a tweet, optionally with an image attached.
+
+    """
+    if len(text) > 140:
+        raise ValueError('tweet is too long')
+
+    auth = twitter.OAuth(
+        user_token or os.environ['TWITTER_USER_TOKEN'],
+        user_secret or os.environ['TWITTER_USER_SECRET'],
+        consumer_key or os.environ['TWITTER_CONSUMER_KEY'],
+        consumer_secret or os.environ['TWITTER_CONSUMER_SECRET'])
+
+    image_data, image_id = None, None
+    if image_path:
+        with open(image_path, 'rb') as image_file:
+            image_data = image_file.read()
+        t_up = twitter.Twitter(domain='upload.twitter.com', auth=auth)
+        image_id = t_up.media.upload(media=image_data)['media_id_string']
+
+    if not (text.strip() or image_id):
+        raise ValueError('no text or images to tweet')
+
+    t_api = twitter.Twitter(auth=auth)
+
+    params = {
+        'status': text,
+        'trim_user': True,
+    }
+
+    if image_id:
+        params.update({
+            'media[]': base64.b64encode(image_data),
+            '_base64': True,
+        })
+        return t_api.statuses.update_with_media(**params)
+    else:
+        return t_api.statuses.update(**params)
+
+
 def main():
     print('Generating')
     svg = dust_svg(WIDTH, HEIGHT)
@@ -95,12 +143,17 @@ def main():
         svg_file.write(svg)
 
     print('Writing %s' % OUTPUT_PNG_PATH)
-    with open(OUTPUT_PNG_PATH, 'bw') as png_file:
+    with open(OUTPUT_PNG_PATH, 'wb') as png_file:
         subprocess.call(['rsvg-convert', OUTPUT_SVG_PATH], stdout=png_file)
 
     print('Writing %s' % OUTPUT_JPG_PATH)
     subprocess.call(['convert', OUTPUT_PNG_PATH, '-quality',
                      str(OUTPUT_JPG_QUALITY), OUTPUT_JPG_PATH])
+
+    if 'tweet' in sys.argv:
+        text = choice(EMOJI)
+        print('Tweeting')
+        post_tweet(text, image_path=OUTPUT_JPG_PATH)
 
     print('Done')
 
