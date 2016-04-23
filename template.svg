@@ -1,7 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     width="${width}" height="${height}">
 
     <defs>
+
         <filter id="noise1">
             <feTurbulence
                 baseFrequency="${noise_base_freq}"
@@ -28,15 +31,40 @@
         <filter id="starblur" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="${star_blur_amount}" />
         </filter>
+
+        <g id="star-bright">
+            <circle r="4" fill="rgba(255, 255, 255, 0.2)" />
+            <circle r="1" fill="rgba(255, 255, 255, 1.0)" />
+        </g>
+        <g id="star-faint">
+            <circle r="4" fill="rgba(255, 255, 255, 0.2)" />
+            <circle r="0.5" fill="rgba(255, 255, 255, 1.0)" />
+        </g>
+        <g id="star-red">
+            <circle r="4" fill="rgba(255, 0, 0, 0.2)" />
+            <circle r="2" fill="rgba(255, 255, 255, 0.5)" />
+            <circle r="0.5" fill="rgba(255, 255, 255, 1.0)" />
+        </g>
+        <g id="star-blue">
+            <circle r="4" fill="rgba(0, 0, 255, 0.2)" />
+            <circle r="2" fill="rgba(255, 255, 255, 0.5)" />
+            <circle r="0.5" fill="rgba(255, 255, 255, 1.0)" />
+        </g>
+
+        <filter id="star-screen" x="-50%" y="-50%" width="200%" height="200%">
+            <!--<feGaussianBlur in="SourceGraphic" stdDeviation="${star_blur_amount}" />-->
+            <feBlend mode="screen" in2="clouds" />
+        </filter>
+
     </defs>
 
     <rect x="0" y="0" width="100%" height="100%" fill="black" />
     <rect x="0" y="0" width="100%" height="100%" filter="url(#noise1)" />
     <rect x="0" y="0" width="100%" height="100%" filter="url(#noise2)" />
-    <rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0.5)" />
+    <rect x="0" y="0" width="100%" height="100%" fill="rgba(0, 0, 0, 0.5)" />
 
     <g id="clouds" filter="url(#cloudblur)">
-      % for _ in range(15):
+      % for _ in range(20):
         <circle
             cx="${rand_x()}" cy="${rand_y()}"
             r="${rand_cloud_radius()}"
@@ -46,24 +74,12 @@
       % endfor
     </g>
 
-    <g id="stars">
-      % for _ in range(100):
-        <%
-            star_r1 = rand_star_radius()
-            star_r2 = '%.2f' % (float(star_r1) * 0.7)
-        %>
-        <g transform="translate(${rand_x()}, ${rand_y()})" filter="url(#starblur)">
-            <circle
-                cx="0" cy="0"
-                r="${star_r1}"
-                fill="rgba(${rand_star_rgb()}, ${rand_star_alpha()})"
-            />
-            <circle
-                cx="${rand_star_offset()}" cy="${rand_star_offset()}"
-                r="${star_r2}"
-                fill="rgba(255, 255, 255, ${rand_star_alpha()})"
-            />
-        </g>
+    <g id="stars" filter="url(#star-screen)">
+      % for _ in range(2000):
+        <use
+            xlink:href="#${rand_star_type()}"
+            transform="translate(${rand_x()}, ${rand_y()}) scale(${rand_star_radius()})"
+        />
       % endfor
     </g>
 
