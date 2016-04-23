@@ -54,7 +54,7 @@ def dust_svg(width, height, template_path=TEMPLATE_PATH):
         'noise_type': choice(('turbulence', 'fractalNoise')),
 
         'cloud_blur_amount': randint(20, 30),
-        'rand_cloud_alpha': '%0.3f' % ((random() * 0.06) + 0.1),
+        'rand_cloud_alpha': '%0.3f' % ((random() * 0.04) + 0.1),
         'rand_cloud_radius': lambda: randint(100, 400),
         'rand_cloud_rgb': lambda: '%d, %d, %d' % choice((
             (rand_value_bright(),
@@ -68,13 +68,13 @@ def dust_svg(width, height, template_path=TEMPLATE_PATH):
              0xEE),
         )),
 
-        'star_blur_amount': '%f,%f' % (choice((1.5, 2)), choice((1.5, 2))),
+        'star_blur_amount': 0.5,
         'rand_star_alpha': lambda: (
             choice((0.1, 0.1, 0.1, 0.2, 0.2))
             or '%.2f' % (random() * 0.5)
         ),
         'rand_star_offset': lambda: '%.2f' % (random() * random() * 2),
-        'rand_star_radius': lambda: '%.2f' % (random() * random() * 2.5 + 0.5),
+        'rand_star_radius': lambda: '%.2f' % (random() * random() * random() * 2 + 0.5),
         'rand_star_rgb': lambda: '%d, %d, %d' % (
             byteval(rand_value_bright() * 1.25),
             byteval(rand_value_bright() * 1.25),
@@ -100,7 +100,7 @@ def main():
 
     print('Writing %s' % OUTPUT_JPG_PATH)
     subprocess.call(['convert', OUTPUT_PNG_PATH, '-quality',
-                     str(OUTPUT_JPG_QUALITY), '-strip', OUTPUT_JPG_PATH])
+                     str(OUTPUT_JPG_QUALITY), OUTPUT_JPG_PATH])
 
     print('Done')
 
