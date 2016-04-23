@@ -20,11 +20,12 @@ TEMPLATE_PATH = 'template.svg'
 
 OUTPUT_SVG_PATH = 'output.svg'
 OUTPUT_PNG_PATH = 'output.png'
-OUTPUT_JPG_PATH = 'output.jpg'
+OUTPUT_CROP_PNG_PATH = 'output-crop.png'
+OUTPUT_JPG_PATH = 'output-crop.jpg'
 OUTPUT_JPG_QUALITY = 95
 
-WIDTH = 840
-HEIGHT = 600
+CANVAS_SIZE = (1040, 800)
+CROP_SIZE = (840, 600)
 
 INT_MAX = 2 ** 64 - 1
 
@@ -51,8 +52,8 @@ def dust_svg(width, height, template_path=TEMPLATE_PATH):
     params = {
         'width': width,
         'height': height,
-        'rand_x': lambda: randint(-100, width + 100),
-        'rand_y': lambda: randint(-100, height + 100),
+        'rand_x': lambda: randint(0, width),
+        'rand_y': lambda: randint(0, height),
 
         'noise_base_freq': '%0.3f' % (random() * 0.1),
         'noise_seed': randint(0, INT_MAX),
@@ -136,7 +137,8 @@ def post_tweet(text, image_path=None,
 
 def main():
     print('Generating')
-    svg = dust_svg(WIDTH, HEIGHT)
+    width, height = CANVAS_SIZE
+    svg = dust_svg(width, height)
 
     print('Writing %s' % OUTPUT_SVG_PATH)
     with open(OUTPUT_SVG_PATH, 'w') as svg_file:
@@ -146,8 +148,17 @@ def main():
     with open(OUTPUT_PNG_PATH, 'wb') as png_file:
         subprocess.call(['rsvg-convert', OUTPUT_SVG_PATH], stdout=png_file)
 
+    print('Writing %s' % OUTPUT_CROP_PNG_PATH)
+    crop_width, crop_height = CROP_SIZE
+    crop_x = (width - crop_width) / 2
+    crop_y = (height - crop_height) / 2
+    assert crop_x >= 0 and crop_y >= 0
+    subprocess.call(['convert', OUTPUT_PNG_PATH, '-crop', '%dx%d+%d+%d'
+                     % (crop_width, crop_height, crop_x, crop_y),
+                     OUTPUT_CROP_PNG_PATH])
+
     print('Writing %s' % OUTPUT_JPG_PATH)
-    subprocess.call(['convert', OUTPUT_PNG_PATH, '-quality',
+    subprocess.call(['convert', OUTPUT_CROP_PNG_PATH, '-quality',
                      str(OUTPUT_JPG_QUALITY), OUTPUT_JPG_PATH])
 
     if 'tweet' in sys.argv:
