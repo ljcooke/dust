@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+    width="${width}" height="${height}">
+
+    <defs>
+        <filter id="noise">
+            <feTurbulence
+                baseFrequency="${noise_base_freq}"
+                numOctaves="5"
+                seed="${noise_seed}"
+                type="${noise_type}"
+            />
+        </filter>
+        <filter id="cloudblur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="${cloud_blur_amount}" />
+        </filter>
+        <filter id="starblur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="${star_blur_amount}" />
+        </filter>
+    </defs>
+
+    <rect x="0" y="0" width="100%" height="100%" filter="url(#noise)" />
+    <rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0.95)" />
+
+    <g id="clouds" filter="url(#cloudblur)">
+      % for _ in range(15):
+        <circle
+            cx="${rand_x()}" cy="${rand_y()}"
+            r="${rand_cloud_radius()}"
+            fill="rgba(${rand_cloud_rgb()}, ${rand_cloud_alpha})"
+            filter="url(#cloudblur)"
+        />
+      % endfor
+    </g>
+
+    <g id="stars">
+      % for _ in range(200):
+        <%
+            star_r1 = rand_star_radius()
+            star_r2 = '%.2f' % (float(star_r1) * 0.5)
+        %>
+        <g transform="translate(${rand_x()}, ${rand_y()})" filter="url(#starblur)">
+            <circle
+                cx="0" cy="0"
+                r="${star_r1}"
+                fill="rgba(${rand_star_rgb()}, ${rand_star_alpha()})"
+            />
+            <circle
+                cx="${rand_star_offset()}" cy="${rand_star_offset()}"
+                r="${star_r2}"
+                fill="rgba(255, 255, 255, ${rand_star_alpha()})"
+            />
+        </g>
+      % endfor
+    </g>
+
+</svg>
