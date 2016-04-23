@@ -14,8 +14,11 @@ __license__ = 'http://unlicense.org/'
 
 
 TEMPLATE_PATH = 'template.svg'
+
 OUTPUT_SVG_PATH = 'output.svg'
 OUTPUT_PNG_PATH = 'output.png'
+OUTPUT_JPG_PATH = 'output.jpg'
+OUTPUT_JPG_QUALITY = 95
 
 WIDTH = 840
 HEIGHT = 600
@@ -94,6 +97,10 @@ def main():
     print('Writing %s' % OUTPUT_PNG_PATH)
     with open(OUTPUT_PNG_PATH, 'bw') as png_file:
         subprocess.call(['rsvg-convert', OUTPUT_SVG_PATH], stdout=png_file)
+
+    print('Writing %s' % OUTPUT_JPG_PATH)
+    subprocess.call(['convert', OUTPUT_PNG_PATH, '-quality',
+                     str(OUTPUT_JPG_QUALITY), '-strip', OUTPUT_JPG_PATH])
 
     print('Done')
 
