@@ -49,6 +49,16 @@ def dust_svg(width, height, template_path=TEMPLATE_PATH):
     rand_value_middle = lambda: (choice(MIDDLE_VALUES + (None,))
                                  or choice(DARK_VALUES))
 
+    rgb_bright = lambda: (rand_value_bright(),
+                          rand_value_bright(),
+                          rand_value_bright())
+    rgb_middle = lambda: (rand_value_middle(),
+                          rand_value_middle(),
+                          rand_value_middle())
+    rgb_redder  = lambda: (0xEE, rand_value_middle(), rand_value_middle())
+    rgb_greener = lambda: (rand_value_middle(), 0xEE, rand_value_middle())
+    rgb_bluer   = lambda: (rand_value_middle(), rand_value_middle(), 0xEE)
+
     params = {
         'width': width,
         'height': height,
@@ -63,15 +73,12 @@ def dust_svg(width, height, template_path=TEMPLATE_PATH):
         'rand_cloud_alpha': '%0.3f' % ((random() * 0.04) + 0.1),
         'rand_cloud_radius': lambda: randint(200, 800),
         'rand_cloud_rgb': lambda: '%d, %d, %d' % choice((
-            (rand_value_bright(), rand_value_bright(), rand_value_bright()),
-            (rand_value_bright(), rand_value_bright(), rand_value_bright()),
-            (rand_value_middle(), rand_value_middle(), rand_value_middle()),
-            (0xEE, rand_value_middle(), rand_value_middle()),
-            (0xEE, rand_value_middle(), rand_value_middle()),
-            (rand_value_middle(), 0xEE, rand_value_middle()),
-            (rand_value_middle(), rand_value_middle(), 0xEE),
-            (rand_value_middle(), rand_value_middle(), 0xEE),
-        )),
+            rgb_bright, rgb_bright, rgb_bright, rgb_bright, rgb_bright,
+            rgb_middle, rgb_middle,
+            rgb_redder, rgb_redder, rgb_redder, rgb_redder, rgb_redder,
+            rgb_greener,
+            rgb_bluer, rgb_bluer, rgb_bluer, rgb_bluer, rgb_bluer,
+        ))(),
 
         'star_blur_amount': 0.1,
         'rand_star_alpha': lambda: (
