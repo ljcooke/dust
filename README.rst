@@ -3,8 +3,8 @@ dust.py
 
 Dust cloud generator for `@dust_exe`_, a Twitter bot.
 
-Originally the bot was made with `Cheap Bots Done Quick`_, then rewritten in
-Python. The original `Tracery JSON source`_ is available.
+Originally a proof of concept was made with `Cheap Bots Done Quick`_, then
+rewritten in Python. The original `Tracery JSON source`_ is available.
 
 Requirements
 ------------
