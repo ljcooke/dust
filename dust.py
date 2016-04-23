@@ -51,8 +51,8 @@ def dust_svg(width, height, template_path=TEMPLATE_PATH):
     params = {
         'width': width,
         'height': height,
-        'rand_x': lambda: randint(0, width),
-        'rand_y': lambda: randint(0, height),
+        'rand_x': lambda: randint(-100, width + 100),
+        'rand_y': lambda: randint(-100, height + 100),
 
         'noise_base_freq': '%0.3f' % (random() * 0.1),
         'noise_seed': randint(0, INT_MAX),
